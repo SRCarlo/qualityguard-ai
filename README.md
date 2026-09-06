@@ -467,7 +467,7 @@ The project demonstrates how specialized AI agents can collaborate through a con
 
 **Team:** Naoe
 
-**Lead:** Shubham Raut
+**Lead:** [Shubham Raut](https://github.com/SRCarlo)
 
 ---
 
