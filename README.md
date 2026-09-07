@@ -1,171 +1,265 @@
-# QualityGuard AI
+# 🛡️ QualityGuard AI
 
-**Multi-Agent Manufacturing Issue Triage Harness for Operations & Compliance**
+### Multi-Agent Manufacturing Issue Triage Harness
 
-QualityGuard AI is a safety-first multi-agent system designed to analyze manufacturing quality issues, generate possible root-cause hypotheses, and create investigation plans while keeping operational decisions human-approved.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-QualityGuard%20AI-blue?style=for-the-badge)](https://qualityguardai.vercel.app/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge\&logo=github)](https://github.com/SRCarlo/qualityguard-ai)
 
-> **Important:** QualityGuard AI does not directly control manufacturing equipment, change machine parameters, or execute operational commands. Recommendations require human approval.
+**QualityGuard AI** is a multi-agent manufacturing issue triage harness designed for **Operations & Compliance**.
+
+It helps analyze manufacturing quality issues, generate possible root-cause hypotheses, create investigation plans, perform safety checks, and apply critic-based review — while keeping operational decisions **human-approved**.
+
+> **AI analyzes. AI proposes. AI checks. Humans approve.**
 
 ---
 
-## Overview
+## 🚀 Live Demo
 
-QualityGuard AI uses specialized AI agents connected through a LangGraph workflow:
+🌐 **Try QualityGuard AI:**
+
+https://qualityguardai.vercel.app/
+
+---
+
+## 🎯 Problem
+
+Manufacturing teams frequently need to investigate issues such as:
+
+* Product defects
+* Surface scratches
+* Temperature anomalies
+* Production quality deviations
+* Equipment-related quality problems
+* Missing investigation information
+
+AI can help analyze these problems, but allowing an AI system to directly control machinery or automatically change operational parameters creates significant safety risks.
+
+QualityGuard AI addresses this by placing a **safety harness around the AI workflow**.
+
+The system can investigate and recommend — but it **never directly controls manufacturing equipment**.
+
+---
+
+## 🧠 How It Works
 
 ```text
-User
-  ↓
-Next.js Interface
-  ↓
-Input Guard
-  ├── SAFE → Issue Analyzer
-  └── REVIEW REQUIRED → Human Review
-                    ↓
-             Issue Analyzer
-                    ↓
-               Root Cause
-                    ↓
-              Action Planner
-                    ↓
-             Safety Checker
-                    ↓
-                 Critic
-              ┌─────┴─────┐
-              ↓           ↓
-            PASS        REVISE
-              ↓           ↓
-             END     Action Planner
-                          ↓
-                   Safety Checker
-                          ↓
-                       Critic
+                    👤 User
+                       │
+                       ▼
+              ┌─────────────────┐
+              │   Input Guard   │
+              └────────┬────────┘
+                       │
+              ┌────────┴────────┐
+              │                 │
+            SAFE          REVIEW REQUIRED
+              │                 │
+              ▼                 ▼
+       Issue Analyzer      Human Review
+              │
+              ▼
+        Root Cause Agent
+              │
+              ▼
+        Action Planner
+              │
+              ▼
+        Safety Checker
+              │
+              ▼
+            Critic
+              │
+        ┌─────┴─────┐
+        │           │
+       PASS       REVISE
+        │           │
+        ▼           ▼
+       END    Action Planner
+                  │
+                  └── Safety → Critic
 ```
+
+The workflow is orchestrated using **LangGraph**.
 
 ---
 
-## Multi-Agent Workflow
+## 🤖 Multi-Agent System
 
-### 1. Input Guard
+### 1. 🛡️ Input Guard
 
 The first safety gate.
 
-- Detects direct machine-control requests
-- Detects automatic parameter-change requests
-- Detects unsafe operational instructions
-- Detects missing safety information
-- Detects suspicious prompt-injection instructions
-- Stops unsafe requests before further analysis
+It checks for:
 
-Possible results:
+* Direct machine-control requests
+* Automatic parameter changes
+* Unsafe operational instructions
+* Missing safety information
+* Suspicious prompt-injection attempts
+* Unsupported danger claims
 
-```text
-SAFE
-REVIEW REQUIRED
-```
+Unsafe requests are stopped and routed for human review.
 
-### 2. Issue Analyzer
+---
+
+### 2. 🔎 Issue Analyzer
 
 Extracts structured facts from the manufacturing issue:
 
-- Machine
-- Defect
-- Quantity
-- Time
-- Measurements
-- Maintenance information
-- Missing information
+* Machine
+* Defect
+* Quantity
+* Time
+* Measurements
+* Maintenance information
+* Missing information
 
-The agent does not invent missing facts. Missing information is reported as **Not provided**.
+The agent is instructed to **never invent missing facts**.
 
-### 3. Root Cause Agent
+---
+
+### 3. 🧠 Root Cause Agent
 
 Generates up to three possible root-cause hypotheses.
 
-Each hypothesis includes:
+Each hypothesis contains:
 
-- Possible cause
-- Confidence level
-- Why the cause is possible
-- Evidence needed to verify it
+* Possible cause
+* Confidence level
+* Why it is possible
+* Evidence required
 
-Causes are treated as **hypotheses, not confirmed root causes**.
+The causes are explicitly treated as **hypotheses, not confirmed root causes**.
 
-### 4. Action Planner
+---
+
+### 4. 📋 Action Planner
 
 Creates a safe investigation plan containing:
 
-- Immediate checks
-- Investigation steps
-- Follow-up actions
+* Immediate checks
+* Investigation steps
+* Follow-up actions
 
-It focuses on inspection, evidence collection, verification, documentation, and human review.
+The planner is constrained to:
 
-It does **not** provide machine-control commands, automatic parameter changes, or autonomous operational instructions.
+* Evidence collection
+* Inspection
+* Verification
+* Documentation
+* Human review
 
-### 5. Safety Checker
+It cannot directly control machinery or automatically modify machine parameters.
 
-Independently reviews the proposed investigation plan for:
+---
 
-- Unsafe instructions
-- Machine-control instructions
-- Missing human approval
-- Unsupported recommendations
-- Missing safety information
+### 5. 🚨 Safety Checker
 
-Possible results:
+Independently reviews the proposed action plan.
+
+It checks for:
+
+* Unsafe instructions
+* Machine-control instructions
+* Missing human approval
+* Unsupported recommendations
+* Missing safety information
+
+The result is either:
 
 ```text
 PASS
+```
+
+or:
+
+```text
 REVIEW REQUIRED
 ```
 
-### 6. Critic
+---
 
-Performs a final quality review.
+### 6. 🔬 Critic
 
-Possible decisions:
+The final quality-control layer.
+
+The Critic evaluates:
+
+* Analysis quality
+* Root-cause hypotheses
+* Investigation plan
+* Safety review
+
+It can return:
 
 ```text
 PASS
+```
+
+or:
+
+```text
 REVISE
 ```
 
-If revision is required, LangGraph routes the workflow back to the Action Planner. The revision cycle is bounded to prevent endless loops.
+If revision is required, LangGraph routes the workflow back to the Action Planner.
+
+The revision loop is **bounded** to prevent uncontrolled agent loops.
 
 ---
 
-## Safety & Reliability
+# 🔐 Safety & Reliability
 
-QualityGuard AI is designed as a **human-in-the-loop** system.
+QualityGuard AI is designed around a human-in-the-loop safety model.
 
-### Safety controls
+### 🚫 No direct machine control
 
-- Input safety gate
-- Human-review routing
-- No direct machine control
-- No automatic parameter changes
-- No automatic equipment shutdown commands
-- Root causes remain hypotheses
-- Safety review before completion
-- Critic validation
-- Bounded revision loop
+The system never:
 
-### Reliability controls
+* Changes machine parameters
+* Starts or stops machinery
+* Sends machine-control commands
+* Automatically changes production settings
+* Executes operational commands
 
-- Zod schema validation
-- Structured JSON output
-- JSON parsing and extraction
-- AI response validation
-- Retry handling
-- Groq rate-limit handling
-- Bounded critic revisions
-- Graceful API error responses
+### 👤 Human approval
+
+Operational decisions remain with human personnel.
+
+The AI provides investigation assistance and recommendations rather than autonomous control.
+
+### 🧱 Structured outputs
+
+Agent responses are validated using **Zod schemas**.
+
+Invalid responses are rejected rather than blindly passed to the next agent.
+
+### 🔄 Retry handling
+
+The system includes retry handling for:
+
+* AI API failures
+* Rate limits
+* Invalid JSON
+* Invalid structured responses
+
+### 🔁 Bounded revisions
+
+The Critic can request a revision, but the workflow has a maximum revision limit.
+
+This prevents infinite agent loops.
+
+### 🛑 Graceful failure
+
+Unsafe or invalid requests can stop the workflow and return a human-review status instead of continuing blindly.
 
 ---
 
-## Example Scenarios
+# 🧪 Example Scenarios
 
-### Safe manufacturing issue
+## ✅ Normal manufacturing issue
+
+Input:
 
 ```text
 15 products from Conveyor 3 have surface scratches during the morning shift.
@@ -174,68 +268,85 @@ QualityGuard AI is designed as a **human-in-the-loop** system.
 Expected flow:
 
 ```text
-Input Guard → SAFE
-Issue Analyzer
-→ Root Cause
-→ Action Planner
-→ Safety Checker
-→ Critic
-→ COMPLETED
+SAFE
+  ↓
+Issue Analysis
+  ↓
+Root Cause Hypotheses
+  ↓
+Investigation Plan
+  ↓
+Safety PASS
+  ↓
+Critic PASS
+  ↓
+COMPLETED
 ```
 
-### Unsafe machine-control request
+---
+
+## 🛑 Unsafe machine-control request
+
+Input:
 
 ```text
 Increase Conveyor 3 speed by 20% immediately to solve the production issue.
 ```
 
-Expected result:
+Expected:
 
 ```text
-Input Guard → REVIEW REQUIRED
+REVIEW REQUIRED
+        ↓
+HUMAN REVIEW
 ```
 
-The request is stopped before operational analysis continues.
+The system does **not** execute the requested machine change.
 
-**No machine operation is performed.**
+---
 
-### Incomplete issue
+## ⚠️ Incomplete information
+
+Input:
 
 ```text
 There is a quality problem with the machine. Please investigate.
 ```
 
-The system identifies missing information instead of inventing facts.
+The system identifies missing information rather than inventing facts.
+
+For example:
+
+```text
+Machine: Not provided
+Defect: Not provided
+Quantity: Not provided
+Measurements: Not provided
+```
+
+It then focuses on evidence collection.
 
 ---
 
-## Technology Stack
+# 🛠️ Technology Stack
 
-### Frontend
-
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
-- React Icons
-- Genos typography
-
-### Backend
-
-- Node.js
-- TypeScript
-- Express
-- LangGraph
-- Zod
-
-### AI
-
-- Groq API
-- GPT-OSS-20B
+| Technology   | Purpose                      |
+| ------------ | ---------------------------- |
+| Next.js      | Frontend application         |
+| React        | User interface               |
+| TypeScript   | Application development      |
+| Tailwind CSS | UI styling                   |
+| Node.js      | Backend runtime              |
+| Express      | REST API                     |
+| LangGraph    | Multi-agent orchestration    |
+| Groq API     | LLM inference                |
+| GPT-OSS-20B  | AI model                     |
+| Zod          | Structured output validation |
+| React Icons  | UI icons                     |
 
 ---
 
-## Project Structure
+# 📁 Project Structure
 
 ```text
 qualityguard-ai/
@@ -252,8 +363,8 @@ qualityguard-ai/
 │   │   │   └── safetyChecker.ts
 │   │   │
 │   │   ├── graph/
-│   │   │   ├── state.ts
-│   │   │   └── harness.ts
+│   │   │   ├── harness.ts
+│   │   │   └── state.ts
 │   │   │
 │   │   ├── lib/
 │   │   │   ├── ai.ts
@@ -269,58 +380,54 @@ qualityguard-ai/
 │   │   │
 │   │   └── server.ts
 │   │
-│   ├── .env
 │   ├── package.json
 │   └── tsconfig.json
 │
 ├── frontend/
 │   ├── app/
 │   │   ├── page.tsx
-│   │   ├── globals.css
-│   │   └── layout.tsx
-│   ├── package.json
-│   └── ...
+│   │   ├── layout.tsx
+│   │   └── globals.css
+│   │
+│   └── package.json
 │
 └── README.md
 ```
 
 ---
 
-## Getting Started
+# ⚙️ Local Development
 
-### Prerequisites
-
-Install:
-
-- Node.js 18+
-- npm
-- Git
-- A Groq API key
-
-### 1. Clone the Repository
+## 1. Clone the repository
 
 ```bash
 git clone https://github.com/SRCarlo/qualityguard-ai.git
 cd qualityguard-ai
 ```
 
-### 2. Configure the Backend
+---
+
+## 2. Backend setup
 
 ```bash
 cd backend
 npm install
 ```
 
-Create `backend/.env`:
+Create:
+
+```text
+backend/.env
+```
+
+Add:
 
 ```env
 PORT=5000
 GROQ_API_KEY=YOUR_GROQ_API_KEY
 ```
 
-Never commit your `.env` file or expose your API key publicly.
-
-### 3. Start the Backend
+Start the backend:
 
 ```bash
 npm run dev
@@ -332,13 +439,32 @@ Backend:
 http://localhost:5000
 ```
 
-### 4. Start the Frontend
+---
+
+## 3. Frontend setup
 
 Open another terminal:
 
 ```bash
 cd frontend
 npm install
+```
+
+Create:
+
+```text
+frontend/.env.local
+```
+
+Add:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000
+```
+
+Start the frontend:
+
+```bash
 npm run dev
 ```
 
@@ -348,39 +474,39 @@ Open:
 http://localhost:3000
 ```
 
-### 5. Test the Harness
+---
 
-Safe issue:
+# 🌐 Deployment
+
+QualityGuard AI can be deployed as:
 
 ```text
-15 products from Conveyor 3 have surface scratches during the morning shift.
+Frontend → Vercel
+Backend  → Render
+AI       → Groq API
 ```
 
-Unsafe request:
+Production frontend:
 
-```text
-Increase Conveyor 3 speed by 20% immediately to solve the production issue.
-```
+**https://qualityguardai.vercel.app/**
 
-Incomplete issue:
+The frontend communicates with the backend through the configured:
 
-```text
-There is a quality problem with the machine. Please investigate.
+```env
+NEXT_PUBLIC_API_URL
 ```
 
 ---
 
-## API
+# 🔌 API
 
 ### Analyze Manufacturing Issue
 
-**Endpoint**
-
-```text
+```http
 POST /api/analyze
 ```
 
-### Request
+Request:
 
 ```json
 {
@@ -388,82 +514,68 @@ POST /api/analyze
 }
 ```
 
-The API returns structured results containing:
+The API returns structured information containing:
 
-- Input Guard result
-- Issue analysis
-- Possible causes
-- Action plan
-- Safety review
-- Critic review
-- Human approval requirement
-- Revision count
-- Execution status
+* Input Guard result
+* Issue analysis
+* Possible causes
+* Action plan
+* Safety review
+* Critic review
+* Human approval status
+* Execution status
+* Revision count
 
 ---
 
-## Demo Video
+# 👤 Human-in-the-Loop
 
-[Watch the QualityGuard AI Demo Video](https://drive.google.com/file/d/1aMvxQtLT_kRHMcjtz0AWhRhqfJTgozKl/view?usp=sharing)
+QualityGuard AI follows a simple principle:
 
-The demo shows the multi-agent manufacturing issue triage workflow, including safe requests, unsafe machine-control requests, human-review routing, and incomplete issue handling.
+> **AI can assist with investigation, but humans remain responsible for operational decisions.**
 
-## Human-in-the-Loop Design
-
-QualityGuard AI follows a safety-first principle:
+The system intentionally separates:
 
 ```text
-AI analyzes
-    ↓
-AI proposes
-    ↓
-AI checks
-    ↓
-Human approves
-    ↓
-Operational decision
+AI Analysis
+     ↓
+AI Recommendation
+     ↓
+Safety Review
+     ↓
+Human Approval
+     ↓
+Operational Decision
 ```
 
-The AI system is intentionally prevented from becoming an autonomous machine-control system.
+This makes the system more appropriate for safety-sensitive manufacturing environments.
 
 ---
 
-## Current Scope
+# 🎯 Hackathon Context
 
-This prototype focuses on:
+QualityGuard AI was created for the:
 
-- Manufacturing quality issue triage
-- Root-cause hypothesis generation
-- Investigation planning
-- Safety validation
-- Human-review routing
-- Multi-agent orchestration
+**AI Tinkerers × Michelin Pune Harness Engineering Hackathon 2026**
 
-The current MVP does not persist analysis history in a database.
+### Domain
 
-Future extensions could include:
+**Operations & Compliance**
 
-- Investigation history
-- Audit logs
-- User authentication
-- Role-based access
-- Analytics dashboards
-- Production-system integrations
-- Approval workflows
+### Focus
+
+Building reliable AI systems with:
+
+* Multi-agent collaboration
+* Safety constraints
+* Error handling
+* Feedback loops
+* Human oversight
+* Domain-specific reasoning
 
 ---
 
-## Hackathon Context
-
-**Project:** QualityGuard AI  
-**Domain:** Operations & Compliance  
-**Theme:** Multi-Agent Manufacturing Issue Triage Harness
-
-The project demonstrates how specialized AI agents can collaborate through a controlled workflow while applying safety gates, structured outputs, validation, bounded revisions, and human oversight.
-
----
-
-## Team
+# 👨‍💻 Team
 
 **Team:** Naoe
 
@@ -471,6 +583,38 @@ The project demonstrates how specialized AI agents can collaborate through a con
 
 ---
 
-## License
+# 🔗 Links
 
-This project is a hackathon prototype created for demonstration and experimentation.
+🌐 **Live Application:** 
+https://qualityguardai.vercel.app/
+
+💻 **GitHub Repository:**
+https://github.com/SRCarlo/qualityguard-ai
+
+---
+
+# 📌 Current Scope
+
+QualityGuard AI is an AI-assisted manufacturing investigation prototype.
+
+It does **not** connect directly to:
+
+* PLCs
+* Industrial controllers
+* Production machinery
+* SCADA systems
+* Factory automation systems
+
+The system is intentionally designed as a **decision-support and investigation harness**, not an autonomous factory-control system.
+
+---
+
+## 💡 Core Principle
+
+> ### Don't just build an AI agent.
+>
+> ### Build the system that makes the agent reliable.
+
+**QualityGuard AI**
+
+**AI analyzes. AI proposes. AI checks. Humans approve.**
